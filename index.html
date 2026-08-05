@@ -1,0 +1,446 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <title>英文提词器</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #ffffff;
+      --primary: #e9a7bb;
+      --secondary: #d989a5;
+      --text: #1f2933;
+      --muted: #687385;
+      --line: #e9a7bb52;
+      --card: #ffffffee;
+      --warn: #b7791f;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      min-height: 100%;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(var(--line) 1px, transparent 1px),
+        linear-gradient(90deg, var(--line) 1px, transparent 1px);
+      background-size: 42px 42px;
+      -webkit-mask-image: linear-gradient(to bottom, #0004, transparent);
+      mask-image: linear-gradient(to bottom, #0004, transparent);
+      pointer-events: none;
+    }
+
+    .shell {
+      position: relative;
+      width: min(980px, calc(100% - 40px));
+      margin: 0 auto;
+      padding: 34px 0;
+    }
+
+    .panel {
+      padding: 22px;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: 0 20px 80px #e9a7bb26, inset 0 1px 0 #ffffff;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+
+    .mark {
+      width: 34px;
+      height: 34px;
+      flex: 0 0 auto;
+      border-radius: 8px;
+      background: linear-gradient(135deg, var(--primary), #f5c6d2);
+      box-shadow: 0 0 34px #e9a7bb80;
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: 28px;
+      line-height: 1.1;
+      letter-spacing: 0;
+    }
+
+    .brand p {
+      margin: 5px 0 0;
+      color: var(--muted);
+    }
+
+    .controls {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 170px 132px;
+      gap: 12px;
+      align-items: end;
+    }
+
+    label {
+      display: grid;
+      gap: 7px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .english-field {
+      grid-column: 1 / -1;
+    }
+
+    textarea,
+    input,
+    button {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff9fb;
+      color: var(--text);
+      font: inherit;
+      outline: none;
+    }
+
+    textarea {
+      min-height: 230px;
+      resize: vertical;
+      padding: 14px;
+      line-height: 1.58;
+    }
+
+    input,
+    button {
+      height: 42px;
+      padding: 0 12px;
+    }
+
+    textarea:focus,
+    input:focus {
+      border-color: #e9a7bbaa;
+      box-shadow: 0 0 0 3px #e9a7bb30;
+    }
+
+    button {
+      cursor: pointer;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      border-color: #efb9c9;
+      color: #fff;
+      font-weight: 700;
+    }
+
+    button:disabled {
+      cursor: not-allowed;
+      opacity: 0.55;
+    }
+
+    .stats {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 16px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .stats span {
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 6px 10px;
+      background: #fff7fa;
+    }
+
+    .stats .warn {
+      color: var(--warn);
+      border-color: #ffd16666;
+    }
+
+    .stage {
+      position: fixed;
+      inset: 0;
+      z-index: 10;
+      display: none;
+      justify-content: center;
+      align-items: flex-start;
+      padding-top: clamp(18px, 5vh, 54px);
+      background: #fff;
+    }
+
+    .prompter {
+      position: relative;
+      width: min(80vw, 1120px);
+      min-width: min(60vw, calc(100vw - 24px));
+      text-align: left;
+    }
+
+    .prompt-text {
+      min-height: 3.1em;
+      margin: 0;
+      font-size: clamp(13px, 1.55vw, 20px);
+      line-height: 1.55;
+      font-weight: 400;
+      letter-spacing: 0;
+      color: rgb(219 112 147 / 38%);
+      overflow: hidden;
+      white-space: pre;
+    }
+
+    .cursor {
+      display: none;
+      width: 0.08em;
+      height: 0.94em;
+      margin-left: 0.08em;
+      border-radius: 999px;
+      background: #e9a7bb;
+      vertical-align: -0.1em;
+      box-shadow: 0 0 18px #e9a7bbcc;
+      animation: blink 0.86s step-end infinite;
+    }
+
+    body.is-playing {
+      overflow: hidden;
+    }
+
+    body.is-playing .shell {
+      display: none;
+    }
+
+    body.is-playing .stage {
+      display: flex;
+    }
+
+    @keyframes blink {
+      50% {
+        opacity: 0;
+      }
+    }
+
+    @media (max-width: 760px) {
+      .shell {
+        width: calc(100% - 20px);
+        padding: 16px 0;
+      }
+
+      .panel {
+        padding: 18px;
+      }
+
+      .brand h1 {
+        font-size: 22px;
+      }
+
+      .controls {
+        grid-template-columns: 1fr;
+      }
+
+      textarea {
+        min-height: 260px;
+      }
+
+      .stage {
+        padding-top: clamp(16px, 4vh, 44px);
+      }
+
+      .prompter {
+        width: calc(100vw - 24px);
+        min-width: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <section class="panel">
+      <div class="brand">
+        <span class="mark"></span>
+        <div>
+          <h1>英文提词器</h1>
+          <p>两句一组 / 立刻切换</p>
+        </div>
+      </div>
+
+      <div class="controls">
+        <label class="english-field">
+          英文段落
+          <textarea id="sourceText" autocomplete="off" spellcheck="false" placeholder="Paste English text here. Each sentence should end with a period."></textarea>
+        </label>
+        <label>
+          总秒数
+          <input id="totalSeconds" type="number" min="1" step="1" inputmode="numeric" autocomplete="off" placeholder="例如 90">
+        </label>
+        <button id="startButton" type="button">开始提词</button>
+      </div>
+
+      <div class="stats" aria-live="polite">
+        <span id="sentenceStat">等待输入英文</span>
+        <span id="timeStat">输入总秒数</span>
+      </div>
+    </section>
+  </main>
+
+  <section class="stage" aria-live="off" aria-hidden="true">
+    <div class="prompter">
+      <p class="prompt-text"><span id="promptText"></span><span class="cursor" aria-hidden="true"></span></p>
+    </div>
+  </section>
+
+  <script>
+    const sourceText = document.getElementById("sourceText");
+    const totalSeconds = document.getElementById("totalSeconds");
+    const startButton = document.getElementById("startButton");
+    const sentenceStat = document.getElementById("sentenceStat");
+    const timeStat = document.getElementById("timeStat");
+    const stage = document.querySelector(".stage");
+    const promptText = document.getElementById("promptText");
+
+    let runId = 0;
+
+    function splitSentences(value) {
+      return value
+        .replace(/\s+/g, " ")
+        .split(".")
+        .map(part => part.trim())
+        .filter(Boolean)
+        .map(part => `${part}.`);
+    }
+
+    function groupSentences(sentences) {
+      const groups = [];
+      for (let index = 0; index < sentences.length; index += 2) {
+        groups.push(sentences.slice(index, index + 2));
+      }
+      return groups;
+    }
+
+    function buildSchedule(groups, totalMs) {
+      const reserveMs = Math.min(10000, Math.max(0, totalMs * 0.1));
+      const finalDelay = 180;
+      const blankDurations = groups.map((_, index) => (
+        index === groups.length - 1 ? 0 : 35 + Math.random() * 75
+      ));
+      const blankMs = blankDurations.reduce((sum, duration) => sum + duration, 0);
+      const targetMs = Math.max(
+        groups.length * 80,
+        totalMs - reserveMs - blankMs - finalDelay
+      );
+      const weights = groups.map(() => 0.72 + Math.random() * 0.64);
+      const weightSum = weights.reduce((sum, weight) => sum + weight, 0) || 1;
+
+      return {
+        blankDurations,
+        finalDelay,
+        holdDurations: weights.map(weight => (targetMs * weight) / weightSum),
+      };
+    }
+
+    function estimate(sentences) {
+      if (!sentences.length) return 0;
+      const groups = groupSentences(sentences).length;
+      return Math.max(1, Math.ceil(((groups * 80) + (Math.max(0, groups - 1) * 35) + 180) / 1000));
+    }
+
+    function updateStats() {
+      const sentences = splitSentences(sourceText.value);
+      const seconds = Number(totalSeconds.value);
+      const minimum = estimate(sentences);
+
+      sentenceStat.textContent = sentences.length
+        ? `${sentences.length} 句 / ${groupSentences(sentences).length} 组`
+        : "等待输入英文";
+
+      timeStat.classList.remove("warn");
+      if (!seconds) {
+        timeStat.textContent = "输入总秒数";
+      } else if (minimum && seconds < minimum) {
+        timeStat.textContent = `内容太短，至少 ${minimum}s`;
+        timeStat.classList.add("warn");
+      } else {
+        timeStat.textContent = minimum ? `预计可在 ${seconds}s 内完成` : "输入英文后估算";
+      }
+    }
+
+    function sleep(ms, id) {
+      return new Promise(resolve => {
+        window.setTimeout(() => resolve(runId === id), Math.max(0, ms));
+      });
+    }
+
+    function setPlaying(isPlaying) {
+      document.body.classList.toggle("is-playing", isPlaying);
+      stage.setAttribute("aria-hidden", String(!isPlaying));
+      startButton.disabled = isPlaying;
+    }
+
+    async function startPrompter() {
+      const sentences = splitSentences(sourceText.value);
+      const seconds = Number(totalSeconds.value);
+
+      if (!sentences.length) {
+        sentenceStat.textContent = "请先输入英文段落";
+        return;
+      }
+
+      if (!Number.isFinite(seconds) || seconds <= 0) {
+        timeStat.textContent = "请填写有效秒数";
+        timeStat.classList.add("warn");
+        return;
+      }
+
+      const id = ++runId;
+      const groups = groupSentences(sentences);
+      const schedule = buildSchedule(groups, seconds * 1000);
+      promptText.textContent = "";
+      setPlaying(true);
+
+      for (let index = 0; index < groups.length; index += 1) {
+        if (runId !== id) return;
+        promptText.textContent = groups[index].join("\n");
+        if (!await sleep(schedule.holdDurations[index], id)) return;
+        promptText.textContent = "";
+        if (!await sleep(schedule.blankDurations[index], id)) return;
+      }
+
+      if (runId === id) {
+        await sleep(schedule.finalDelay, id);
+        setPlaying(false);
+        promptText.textContent = "";
+        updateStats();
+      }
+    }
+
+    sourceText.addEventListener("input", updateStats);
+    totalSeconds.addEventListener("input", updateStats);
+    startButton.addEventListener("click", startPrompter);
+
+    document.addEventListener("keydown", event => {
+      if (event.key === "Escape" && document.body.classList.contains("is-playing")) {
+        runId += 1;
+        setPlaying(false);
+        promptText.textContent = "";
+      }
+    });
+
+    updateStats();
+  </script>
+</body>
+</html>
