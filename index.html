@@ -3,10 +3,13 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+
   <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
+
   <title>英文提词器</title>
+
   <style>
     :root {
       color-scheme: light;
@@ -32,57 +35,94 @@
     body {
       margin: 0;
       min-height: 100vh;
-      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+
+      font-family:
+        Inter,
+        system-ui,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        "Microsoft YaHei",
+        sans-serif;
+
       background: var(--bg);
       color: var(--text);
     }
 
     body::before {
       content: "";
+
       position: fixed;
       inset: 0;
+
       background-image:
         linear-gradient(var(--line) 1px, transparent 1px),
         linear-gradient(90deg, var(--line) 1px, transparent 1px);
+
       background-size: 42px 42px;
-      -webkit-mask-image: linear-gradient(to bottom, #0004, transparent);
-      mask-image: linear-gradient(to bottom, #0004, transparent);
+
+      -webkit-mask-image:
+        linear-gradient(to bottom, #0004, transparent);
+
+      mask-image:
+        linear-gradient(to bottom, #0004, transparent);
+
       pointer-events: none;
     }
 
     .shell {
       position: relative;
+
       width: min(980px, calc(100% - 40px));
+
       margin: 0 auto;
       padding: 34px 0;
     }
 
     .panel {
       padding: 22px;
+
       background: var(--card);
+
       border: 1px solid var(--line);
       border-radius: 8px;
-      box-shadow: 0 20px 80px #e9a7bb26, inset 0 1px 0 #ffffff;
+
+      box-shadow:
+        0 20px 80px #e9a7bb26,
+        inset 0 1px 0 #ffffff;
     }
 
     .brand {
       display: flex;
       align-items: center;
+
       gap: 14px;
+
       margin-bottom: 20px;
     }
 
     .mark {
       width: 34px;
       height: 34px;
+
       flex: 0 0 auto;
+
       border-radius: 8px;
-      background: linear-gradient(135deg, var(--primary), #f5c6d2);
-      box-shadow: 0 0 34px #e9a7bb80;
+
+      background:
+        linear-gradient(
+          135deg,
+          var(--primary),
+          #f5c6d2
+        );
+
+      box-shadow:
+        0 0 34px #e9a7bb80;
     }
 
     .brand h1 {
       margin: 0;
+
       font-size: 28px;
       line-height: 1.1;
       letter-spacing: 0;
@@ -90,20 +130,31 @@
 
     .brand p {
       margin: 5px 0 0;
+
       color: var(--muted);
     }
 
     .controls {
       display: grid;
-      grid-template-columns: minmax(0, 1fr) 150px 170px 132px;
+
+      grid-template-columns:
+        minmax(0, 1fr)
+        150px
+        170px
+        132px;
+
       gap: 12px;
+
       align-items: end;
     }
 
     label {
       display: grid;
+
       gap: 7px;
+
       color: var(--muted);
+
       font-size: 13px;
     }
 
@@ -116,17 +167,25 @@
     select,
     button {
       border: 1px solid var(--line);
+
       border-radius: 8px;
+
       background: #fff9fb;
+
       color: var(--text);
+
       font: inherit;
+
       outline: none;
     }
 
     textarea {
       min-height: 230px;
+
       resize: vertical;
+
       padding: 14px;
+
       line-height: 1.58;
     }
 
@@ -134,6 +193,7 @@
     select,
     button {
       height: 42px;
+
       padding: 0 12px;
     }
 
@@ -141,109 +201,239 @@
     input:focus,
     select:focus {
       border-color: #e9a7bbaa;
-      box-shadow: 0 0 0 3px #e9a7bb30;
+
+      box-shadow:
+        0 0 0 3px #e9a7bb30;
     }
 
     button {
       cursor: pointer;
-      background: linear-gradient(135deg, var(--primary), var(--secondary));
+
+      background:
+        linear-gradient(
+          135deg,
+          var(--primary),
+          var(--secondary)
+        );
+
       border-color: #efb9c9;
+
       color: #fff;
+
       font-weight: 700;
     }
 
     button:disabled {
       cursor: not-allowed;
+
       opacity: 0.55;
     }
 
     .stats {
       display: flex;
+
       gap: 10px;
+
       flex-wrap: wrap;
+
       margin-top: 16px;
+
       color: var(--muted);
+
       font-size: 13px;
     }
 
     .stats span {
       border: 1px solid var(--line);
+
       border-radius: 999px;
+
       padding: 6px 10px;
+
       background: #fff7fa;
     }
 
     .stats .warn {
       color: var(--warn);
+
       border-color: #ffd16666;
     }
 
+    /* =========================
+       提词页面
+       ========================= */
+
     .stage {
       position: fixed;
+
       inset: 0;
+
       z-index: 10;
+
       display: none;
+
       justify-content: center;
       align-items: flex-start;
-      padding-top: clamp(18px, 5vh, 54px);
+
+      padding-top:
+        clamp(
+          18px,
+          5vh,
+          54px
+        );
+
       background: #fff;
     }
 
     .prompter {
       position: relative;
-      width: min(80vw, 1120px);
-      min-width: min(60vw, calc(100vw - 24px));
+
+      width:
+        min(
+          80vw,
+          1120px
+        );
+
+      min-width:
+        min(
+          60vw,
+          calc(100vw - 24px)
+        );
+
       text-align: left;
+    }
+
+    /*
+      每一页最多两行。
+
+      这里非常重要：
+
+      max-height = line-height × 2
+                 = 1.55em × 2
+                 = 3.1em
+    */
+
+    .prompt-text {
+      min-height: 3.1em;
+      max-height: 3.1em;
+
+      margin: 0;
+
+      font-size:
+        clamp(
+          13px,
+          1.55vw,
+          20px
+        );
+
+      line-height: 1.55;
+
+      font-weight: 400;
+
+      letter-spacing: 0;
+
+      color:
+        rgb(
+          219 112 147 / 38%
+        );
+
+      overflow: hidden;
+
+      /*
+        允许文本正常自动换行
+      */
+      white-space: normal;
+
+      overflow-wrap: break-word;
+      word-break: normal;
+    }
+
+    /*
+      隐藏的文本测量区域。
+
+      JS 会把文字先放到这里，
+      判断它是不是超过两行。
+    */
+
+    .measure-text {
+      position: absolute;
+
+      visibility: hidden;
+
+      pointer-events: none;
+
+      left: -99999px;
+      top: 0;
+
+      white-space: normal;
+
+      overflow-wrap: break-word;
+
+      word-break: normal;
+
+      margin: 0;
+
+      padding: 0;
     }
 
     .stage-actions {
       display: flex;
+
       justify-content: center;
+
       gap: 12px;
+
       margin-top: 28px;
+
       flex-wrap: wrap;
     }
 
     .stage-actions button {
       min-width: 132px;
+
       height: 46px;
     }
 
     .stage-actions .secondary-button {
       background: #fff9fb;
+
       color: var(--secondary);
+
       border-color: #e9a7bb88;
     }
 
     .mode-tip {
       margin-top: 12px;
-      color: var(--muted);
-      font-size: 13px;
-      text-align: center;
-    }
 
-    .prompt-text {
-      min-height: 3.1em;
-      margin: 0;
-      font-size: clamp(13px, 1.55vw, 20px);
-      line-height: 1.55;
-      font-weight: 400;
-      letter-spacing: 0;
-      color: rgb(219 112 147 / 38%);
-      overflow: hidden;
-      white-space: pre;
+      color: var(--muted);
+
+      font-size: 13px;
+
+      text-align: center;
     }
 
     .cursor {
       display: none;
+
       width: 0.08em;
       height: 0.94em;
+
       margin-left: 0.08em;
+
       border-radius: 999px;
+
       background: #e9a7bb;
+
       vertical-align: -0.1em;
-      box-shadow: 0 0 18px #e9a7bbcc;
-      animation: blink 0.86s step-end infinite;
+
+      box-shadow:
+        0 0 18px #e9a7bbcc;
+
+      animation:
+        blink
+        0.86s
+        step-end
+        infinite;
     }
 
     body.is-playing {
@@ -259,15 +449,23 @@
     }
 
     @keyframes blink {
+
       50% {
         opacity: 0;
       }
+
     }
 
     @media (max-width: 760px) {
+
       .shell {
-        width: calc(100% - 20px);
-        padding: 16px 0;
+        width:
+          calc(
+            100% - 20px
+          );
+
+        padding:
+          16px 0;
       }
 
       .panel {
@@ -287,243 +485,1378 @@
       }
 
       .stage {
-        padding-top: clamp(16px, 4vh, 44px);
+        padding-top:
+          clamp(
+            16px,
+            4vh,
+            44px
+          );
       }
 
       .prompter {
-        width: calc(100vw - 24px);
+        width:
+          calc(
+            100vw - 24px
+          );
+
         min-width: 0;
       }
+
     }
   </style>
 </head>
+
 <body>
+
+  <!-- =========================
+       设置页面
+       ========================= -->
+
   <main class="shell">
+
     <section class="panel">
+
       <div class="brand">
+
         <span class="mark"></span>
+
         <div>
-          <h1>英文提词器</h1>
-          <p>两句一组 / 手动或自动切换</p>
+
+          <h1>
+            英文提词器
+          </h1>
+
+          <p>
+            两行一页 / 手动或自动切换
+          </p>
+
         </div>
+
       </div>
+
 
       <div class="controls">
+
         <label class="english-field">
+
           英文段落
-          <textarea id="sourceText" autocomplete="off" spellcheck="false" placeholder="Paste English text here. Each sentence should end with a period."></textarea>
+
+          <textarea
+            id="sourceText"
+            autocomplete="off"
+            spellcheck="false"
+            placeholder="Paste English text here."
+          ></textarea>
+
         </label>
+
+
         <label>
+
           切换方式
+
           <select id="switchMode">
-            <option value="manual">手动切换</option>
-            <option value="auto">自动切换</option>
+
+            <option value="manual">
+              手动切换
+            </option>
+
+            <option value="auto">
+              自动切换
+            </option>
+
           </select>
+
         </label>
+
+
         <label>
+
           自动切换秒数
-          <input id="autoSeconds" type="number" min="0.2" step="0.1" inputmode="decimal" autocomplete="off" placeholder="例如 5" disabled>
+
+          <input
+            id="autoSeconds"
+            type="number"
+            min="0.2"
+            step="0.1"
+            inputmode="decimal"
+            autocomplete="off"
+            placeholder="例如 5"
+            disabled
+          >
+
         </label>
-        <button id="startButton" type="button">开始提词</button>
+
+
+        <button
+          id="startButton"
+          type="button"
+        >
+          开始提词
+        </button>
+
       </div>
 
-      <div class="stats" aria-live="polite">
-        <span id="sentenceStat">等待输入英文</span>
-        <span id="timeStat">当前：手动切换</span>
+
+      <div
+        class="stats"
+        aria-live="polite"
+      >
+
+        <span id="sentenceStat">
+          等待输入英文
+        </span>
+
+        <span id="timeStat">
+          当前：手动切换
+        </span>
+
       </div>
+
     </section>
+
   </main>
 
-  <section class="stage" aria-live="off" aria-hidden="true">
+
+  <!-- =========================
+       提词显示页面
+       ========================= -->
+
+  <section
+    class="stage"
+    aria-live="off"
+    aria-hidden="true"
+  >
+
     <div class="prompter">
-      <p class="prompt-text"><span id="promptText"></span><span class="cursor" aria-hidden="true"></span></p>
+
+
+      <!--
+        真正显示的文字
+      -->
+
+      <p class="prompt-text">
+
+        <span id="promptText"></span>
+
+        <span
+          class="cursor"
+          aria-hidden="true"
+        ></span>
+
+      </p>
+
+
+      <!--
+        隐藏测量文本
+      -->
+
+      <p
+        id="measureText"
+        class="prompt-text measure-text"
+        aria-hidden="true"
+      ></p>
+
+
       <div class="stage-actions">
-        <button id="nextButton" type="button">下一句</button>
-        <button id="exitButton" class="secondary-button" type="button">退出</button>
+
+        <button
+          id="nextButton"
+          type="button"
+        >
+          下一页
+        </button>
+
+
+        <button
+          id="exitButton"
+          class="secondary-button"
+          type="button"
+        >
+          退出
+        </button>
+
       </div>
-      <div id="modeTip" class="mode-tip">手动模式：点击“下一句”继续</div>
+
+
+      <div
+        id="modeTip"
+        class="mode-tip"
+      >
+        手动模式：点击“下一页”继续
+      </div>
+
     </div>
+
   </section>
 
+
   <script>
-    const sourceText = document.getElementById("sourceText");
-    const switchMode = document.getElementById("switchMode");
-    const autoSeconds = document.getElementById("autoSeconds");
-    const startButton = document.getElementById("startButton");
-    const sentenceStat = document.getElementById("sentenceStat");
-    const timeStat = document.getElementById("timeStat");
-    const stage = document.querySelector(".stage");
-    const promptText = document.getElementById("promptText");
-    const nextButton = document.getElementById("nextButton");
-    const exitButton = document.getElementById("exitButton");
-    const modeTip = document.getElementById("modeTip");
+
+    /* =========================
+       DOM
+       ========================= */
+
+    const sourceText =
+      document.getElementById(
+        "sourceText"
+      );
+
+
+    const switchMode =
+      document.getElementById(
+        "switchMode"
+      );
+
+
+    const autoSeconds =
+      document.getElementById(
+        "autoSeconds"
+      );
+
+
+    const startButton =
+      document.getElementById(
+        "startButton"
+      );
+
+
+    const sentenceStat =
+      document.getElementById(
+        "sentenceStat"
+      );
+
+
+    const timeStat =
+      document.getElementById(
+        "timeStat"
+      );
+
+
+    const stage =
+      document.querySelector(
+        ".stage"
+      );
+
+
+    const promptText =
+      document.getElementById(
+        "promptText"
+      );
+
+
+    const measureText =
+      document.getElementById(
+        "measureText"
+      );
+
+
+    const nextButton =
+      document.getElementById(
+        "nextButton"
+      );
+
+
+    const exitButton =
+      document.getElementById(
+        "exitButton"
+      );
+
+
+    const modeTip =
+      document.getElementById(
+        "modeTip"
+      );
+
+
+    /* =========================
+       状态变量
+       ========================= */
 
     let runId = 0;
-    let groups = [];
+
+    let pages = [];
+
     let currentIndex = 0;
+
     let autoTimer = null;
 
+
+    /* =========================
+       用于统计句子
+       ========================= */
+
     function splitSentences(value) {
+
       return value
-        .replace(/\s+/g, " ")
+
+        .replace(
+          /\s+/g,
+          " "
+        )
+
         .split(".")
-        .map(part => part.trim())
+
+        .map(
+          part =>
+            part.trim()
+        )
+
         .filter(Boolean)
-        .map(part => `${part}.`);
+
+        .map(
+          part =>
+            `${part}.`
+        );
+
     }
 
-    function groupSentences(sentences) {
-      const groups = [];
-      for (let index = 0; index < sentences.length; index += 2) {
-        groups.push(sentences.slice(index, index + 2));
-      }
-      return groups;
+
+    /* =========================
+       清理输入
+       ========================= */
+
+    function normalizeText(value) {
+
+      return value
+
+        .replace(
+          /\s+/g,
+          " "
+        )
+
+        .trim();
+
     }
+
+
+    /* =========================
+       同步字体样式
+
+       测量文本需要和真正显示
+       的文本字体完全一致
+       ========================= */
+
+    function syncMeasureStyle() {
+
+      const textStyle =
+        window.getComputedStyle(
+          document.querySelector(
+            ".prompt-text"
+          )
+        );
+
+
+      measureText.style.width =
+        `${promptText.parentElement.clientWidth}px`;
+
+
+      measureText.style.font =
+        textStyle.font;
+
+
+      measureText.style.fontSize =
+        textStyle.fontSize;
+
+
+      measureText.style.fontWeight =
+        textStyle.fontWeight;
+
+
+      measureText.style.fontFamily =
+        textStyle.fontFamily;
+
+
+      measureText.style.letterSpacing =
+        textStyle.letterSpacing;
+
+
+      measureText.style.lineHeight =
+        textStyle.lineHeight;
+
+    }
+
+
+    /* =========================
+       判断文字是否能放进两行
+       ========================= */
+
+    function fitsTwoLines(text) {
+
+      syncMeasureStyle();
+
+
+      measureText.textContent =
+        text;
+
+
+      const textStyle =
+        window.getComputedStyle(
+          measureText
+        );
+
+
+      const lineHeight =
+        parseFloat(
+          textStyle.lineHeight
+        ) || 31;
+
+
+      /*
+        两行最大高度
+      */
+
+      const maxHeight =
+        lineHeight * 2 + 1;
+
+
+      return (
+        measureText.scrollHeight
+        <=
+        maxHeight
+      );
+
+    }
+
+
+    /* =========================
+       找当前页面最合适的截断位置
+
+       优先：
+       .
+       ?
+       !
+       ;
+       :
+       ,
+       空格
+
+       如果没有合适位置，
+       才硬截断
+       ========================= */
+
+    function findBestBreak(text) {
+
+      /*
+        如果整个文本就能放两行，
+        不需要切
+      */
+
+      if (
+        fitsTwoLines(text)
+      ) {
+
+        return text.length;
+
+      }
+
+
+      /*
+        二分搜索：
+
+        找到可以塞进两行的
+        最大字符长度
+      */
+
+      let low = 1;
+
+      let high =
+        text.length;
+
+      let best = 1;
+
+
+      while (
+        low <= high
+      ) {
+
+        const mid =
+          Math.floor(
+            (
+              low
+              +
+              high
+            )
+            /
+            2
+          );
+
+
+        if (
+          fitsTwoLines(
+            text.slice(
+              0,
+              mid
+            )
+          )
+        ) {
+
+          best = mid;
+
+          low =
+            mid + 1;
+
+        }
+
+        else {
+
+          high =
+            mid - 1;
+
+        }
+
+      }
+
+
+      /*
+        不希望因为一个很早的逗号
+        就浪费很多空间。
+
+        所以只在后 28% 范围内
+        找自然断点。
+      */
+
+      const minPreferred =
+        Math.max(
+          1,
+          Math.floor(
+            best * 0.72
+          )
+        );
+
+
+      const candidate =
+        text.slice(
+          0,
+          best
+        );
+
+
+      const boundaries = [
+
+        candidate.lastIndexOf(
+          ". "
+        ),
+
+        candidate.lastIndexOf(
+          "? "
+        ),
+
+        candidate.lastIndexOf(
+          "! "
+        ),
+
+        candidate.lastIndexOf(
+          "; "
+        ),
+
+        candidate.lastIndexOf(
+          ": "
+        ),
+
+        candidate.lastIndexOf(
+          ", "
+        ),
+
+        candidate.lastIndexOf(
+          " "
+        )
+
+      ];
+
+
+      /*
+        优先找自然断点
+      */
+
+      for (
+        const pos
+        of
+        boundaries
+      ) {
+
+        if (
+          pos >= minPreferred
+        ) {
+
+          return (
+            pos + 1
+          );
+
+        }
+
+      }
+
+
+      /*
+        实在没有自然断点
+        就直接使用最大长度
+      */
+
+      return best;
+
+    }
+
+
+    /* =========================
+       根据屏幕宽度动态分页
+       ========================= */
+
+    function buildPages(value) {
+
+      let remaining =
+        normalizeText(
+          value
+        );
+
+
+      const result = [];
+
+
+      while (
+        remaining
+      ) {
+
+        const cut =
+          findBestBreak(
+            remaining
+          );
+
+
+        let page =
+          remaining
+
+            .slice(
+              0,
+              cut
+            )
+
+            .trim();
+
+
+        /*
+          极端情况下避免空页面
+        */
+
+        if (
+          !page
+        ) {
+
+          page =
+            remaining.slice(
+              0,
+              Math.max(
+                1,
+                cut
+              )
+            );
+
+        }
+
+
+        result.push(
+          page
+        );
+
+
+        /*
+          剩余文字下一页继续
+        */
+
+        remaining =
+          remaining
+
+            .slice(
+              cut
+            )
+
+            .trim();
+
+
+        /*
+          防止异常输入导致死循环
+        */
+
+        if (
+          result.length
+          >
+          10000
+        ) {
+
+          break;
+
+        }
+
+      }
+
+
+      return result;
+
+    }
+
+
+    /* =========================
+       清除自动切换计时器
+       ========================= */
 
     function clearAutoTimer() {
-      if (autoTimer !== null) {
-        window.clearTimeout(autoTimer);
+
+      if (
+        autoTimer !== null
+      ) {
+
+        window.clearTimeout(
+          autoTimer
+        );
+
+
         autoTimer = null;
+
       }
+
     }
+
+
+    /* =========================
+       更新首页统计信息
+       ========================= */
 
     function updateStats() {
-      const sentences = splitSentences(sourceText.value);
-      const mode = switchMode.value;
-      const seconds = Number(autoSeconds.value);
 
-      sentenceStat.textContent = sentences.length
-        ? `${sentences.length} 句 / ${groupSentences(sentences).length} 组`
-        : "等待输入英文";
+      const sentences =
+        splitSentences(
+          sourceText.value
+        );
 
-      timeStat.classList.remove("warn");
 
-      if (mode === "manual") {
-        timeStat.textContent = "当前：手动切换";
-      } else if (!Number.isFinite(seconds) || seconds <= 0) {
-        timeStat.textContent = "请输入有效自动切换秒数";
-        timeStat.classList.add("warn");
-      } else {
-        timeStat.textContent = `当前：每 ${seconds}s 自动切换`;
+      const mode =
+        switchMode.value;
+
+
+      const seconds =
+        Number(
+          autoSeconds.value
+        );
+
+
+      const previewPages =
+        sentences.length
+
+          ? buildPages(
+              sourceText.value
+            )
+
+          : [];
+
+
+      sentenceStat.textContent =
+
+        sentences.length
+
+          ? `${sentences.length} 句 / ${previewPages.length} 页（每页最多两行）`
+
+          : "等待输入英文";
+
+
+      timeStat.classList.remove(
+        "warn"
+      );
+
+
+      if (
+        mode === "manual"
+      ) {
+
+        timeStat.textContent =
+          "当前：手动切换";
+
       }
+
+      else if (
+        !Number.isFinite(
+          seconds
+        )
+        ||
+        seconds <= 0
+      ) {
+
+        timeStat.textContent =
+          "请输入有效自动切换秒数";
+
+
+        timeStat.classList.add(
+          "warn"
+        );
+
+      }
+
+      else {
+
+        timeStat.textContent =
+          `当前：每 ${seconds}s 自动切换`;
+
+      }
+
     }
 
-    function setPlaying(isPlaying) {
-      document.body.classList.toggle("is-playing", isPlaying);
-      stage.setAttribute("aria-hidden", String(!isPlaying));
-      startButton.disabled = isPlaying;
+
+    /* =========================
+       设置播放状态
+       ========================= */
+
+    function setPlaying(
+      isPlaying
+    ) {
+
+      document.body.classList.toggle(
+        "is-playing",
+        isPlaying
+      );
+
+
+      stage.setAttribute(
+        "aria-hidden",
+        String(
+          !isPlaying
+        )
+      );
+
+
+      startButton.disabled =
+        isPlaying;
+
     }
+
+
+    /* =========================
+       退出提词
+       ========================= */
 
     function stopPrompter() {
+
       runId += 1;
+
+
       clearAutoTimer();
-      setPlaying(false);
-      promptText.textContent = "";
-      groups = [];
+
+
+      setPlaying(
+        false
+      );
+
+
+      promptText.textContent =
+        "";
+
+
+      pages = [];
+
+
       currentIndex = 0;
+
+
       updateStats();
+
     }
+
+
+    /* =========================
+       全部播放完成
+       ========================= */
 
     function finishPrompter() {
+
       clearAutoTimer();
-      promptText.textContent = "已完成";
-      nextButton.disabled = true;
-      modeTip.textContent = "全部内容已完成，点击“退出”返回。";
+
+
+      promptText.textContent =
+        "已完成";
+
+
+      nextButton.disabled =
+        true;
+
+
+      modeTip.textContent =
+        "全部内容已完成，点击“退出”返回。";
+
     }
+
+
+    /* =========================
+       自动切换
+       ========================= */
 
     function scheduleNext(id) {
+
       clearAutoTimer();
-      if (switchMode.value !== "auto") return;
 
-      const seconds = Number(autoSeconds.value);
-      if (!Number.isFinite(seconds) || seconds <= 0) return;
 
-      autoTimer = window.setTimeout(() => {
-        if (runId === id && document.body.classList.contains("is-playing")) {
-          showNextGroup(id);
-        }
-      }, seconds * 1000);
-    }
+      if (
+        switchMode.value
+        !==
+        "auto"
+      ) {
 
-    function showCurrentGroup(id) {
-      if (runId !== id || !groups.length) return;
-
-      if (currentIndex >= groups.length) {
-        finishPrompter();
         return;
+
       }
 
-      promptText.textContent = groups[currentIndex].join("\n");
-      nextButton.disabled = false;
 
-      if (switchMode.value === "auto") {
-        const seconds = Number(autoSeconds.value);
-        modeTip.textContent = `自动模式：${seconds}s 后切换，也可点击“下一句”立即切换`;
-      } else {
-        modeTip.textContent = "手动模式：点击“下一句”继续";
+      const seconds =
+        Number(
+          autoSeconds.value
+        );
+
+
+      if (
+        !Number.isFinite(
+          seconds
+        )
+        ||
+        seconds <= 0
+      ) {
+
+        return;
+
       }
 
-      scheduleNext(id);
+
+      autoTimer =
+        window.setTimeout(
+          () => {
+
+            if (
+              runId === id
+              &&
+              document.body.classList.contains(
+                "is-playing"
+              )
+            ) {
+
+              showNextPage(
+                id
+              );
+
+            }
+
+          },
+
+          seconds * 1000
+
+        );
+
     }
 
-    function showNextGroup(id = runId) {
-      if (!document.body.classList.contains("is-playing")) return;
+
+    /* =========================
+       显示当前页面
+       ========================= */
+
+    function showCurrentPage(id) {
+
+      if (
+        runId !== id
+        ||
+        !pages.length
+      ) {
+
+        return;
+
+      }
+
+
+      if (
+        currentIndex
+        >=
+        pages.length
+      ) {
+
+        finishPrompter();
+
+        return;
+
+      }
+
+
+      /*
+        显示当前页面文本
+      */
+
+      promptText.textContent =
+        pages[
+          currentIndex
+        ];
+
+
+      nextButton.disabled =
+        false;
+
+
+      /*
+        状态提示
+      */
+
+      if (
+        switchMode.value
+        ===
+        "auto"
+      ) {
+
+        const seconds =
+          Number(
+            autoSeconds.value
+          );
+
+
+        modeTip.textContent =
+          `第 ${currentIndex + 1}/${pages.length} 页 · 自动模式：${seconds}s 后切换，也可点击“下一页”立即切换`;
+
+      }
+
+      else {
+
+        modeTip.textContent =
+          `第 ${currentIndex + 1}/${pages.length} 页 · 手动模式：点击“下一页”继续`;
+
+      }
+
+
+      /*
+        自动模式开启计时器
+      */
+
+      scheduleNext(
+        id
+      );
+
+    }
+
+
+    /* =========================
+       下一页
+       ========================= */
+
+    function showNextPage(
+      id = runId
+    ) {
+
+      if (
+        !document.body.classList.contains(
+          "is-playing"
+        )
+      ) {
+
+        return;
+
+      }
+
+
       clearAutoTimer();
+
+
       currentIndex += 1;
-      showCurrentGroup(id);
+
+
+      showCurrentPage(
+        id
+      );
+
     }
+
+
+    /* =========================
+       开始提词
+       ========================= */
 
     function startPrompter() {
-      const sentences = splitSentences(sourceText.value);
-      const mode = switchMode.value;
-      const seconds = Number(autoSeconds.value);
 
-      if (!sentences.length) {
-        sentenceStat.textContent = "请先输入英文段落";
+      const sentences =
+        splitSentences(
+          sourceText.value
+        );
+
+
+      const mode =
+        switchMode.value;
+
+
+      const seconds =
+        Number(
+          autoSeconds.value
+        );
+
+
+      /*
+        没有文字
+      */
+
+      if (
+        !sentences.length
+      ) {
+
+        sentenceStat.textContent =
+          "请先输入英文段落";
+
         return;
+
       }
 
-      if (mode === "auto" && (!Number.isFinite(seconds) || seconds <= 0)) {
-        timeStat.textContent = "请填写有效自动切换秒数";
-        timeStat.classList.add("warn");
+
+      /*
+        自动模式必须输入秒数
+      */
+
+      if (
+        mode === "auto"
+        &&
+        (
+          !Number.isFinite(
+            seconds
+          )
+          ||
+          seconds <= 0
+        )
+      ) {
+
+        timeStat.textContent =
+          "请填写有效自动切换秒数";
+
+
+        timeStat.classList.add(
+          "warn"
+        );
+
+
         return;
+
       }
 
-      const id = ++runId;
-      groups = groupSentences(sentences);
+
+      const id =
+        ++runId;
+
+
+      /*
+        根据当前屏幕宽度
+        动态计算页面
+      */
+
+      pages =
+        buildPages(
+          sourceText.value
+        );
+
+
       currentIndex = 0;
-      promptText.textContent = "";
-      nextButton.disabled = false;
-      setPlaying(true);
-      showCurrentGroup(id);
+
+
+      promptText.textContent =
+        "";
+
+
+      nextButton.disabled =
+        false;
+
+
+      setPlaying(
+        true
+      );
+
+
+      showCurrentPage(
+        id
+      );
+
     }
 
-    sourceText.addEventListener("input", updateStats);
-    autoSeconds.addEventListener("input", updateStats);
 
-    switchMode.addEventListener("change", () => {
-      const isAuto = switchMode.value === "auto";
-      autoSeconds.disabled = !isAuto;
-      if (isAuto && !autoSeconds.value) autoSeconds.value = "5";
-      updateStats();
-    });
+    /* =========================
+       输入监听
+       ========================= */
 
-    startButton.addEventListener("click", startPrompter);
-    nextButton.addEventListener("click", () => showNextGroup(runId));
-    exitButton.addEventListener("click", stopPrompter);
+    sourceText.addEventListener(
+      "input",
+      updateStats
+    );
 
-    document.addEventListener("keydown", event => {
-      if (!document.body.classList.contains("is-playing")) return;
 
-      if (event.key === "Escape") {
-        stopPrompter();
-      } else if (event.key === "ArrowRight" || event.key === " ") {
-        event.preventDefault();
-        showNextGroup(runId);
+    autoSeconds.addEventListener(
+      "input",
+      updateStats
+    );
+
+
+    /* =========================
+       手动 / 自动模式切换
+       ========================= */
+
+    switchMode.addEventListener(
+      "change",
+      () => {
+
+        const isAuto =
+          switchMode.value
+          ===
+          "auto";
+
+
+        /*
+          手动模式：
+          秒数输入框禁用
+
+          自动模式：
+          秒数输入框启用
+        */
+
+        autoSeconds.disabled =
+          !isAuto;
+
+
+        /*
+          默认自动切换 5 秒
+        */
+
+        if (
+          isAuto
+          &&
+          !autoSeconds.value
+        ) {
+
+          autoSeconds.value =
+            "5";
+
+        }
+
+
+        updateStats();
+
       }
-    });
+    );
+
+
+    /* =========================
+       开始
+       ========================= */
+
+    startButton.addEventListener(
+      "click",
+      startPrompter
+    );
+
+
+    /* =========================
+       下一页
+       ========================= */
+
+    nextButton.addEventListener(
+      "click",
+      () => {
+
+        showNextPage(
+          runId
+        );
+
+      }
+    );
+
+
+    /* =========================
+       退出
+       ========================= */
+
+    exitButton.addEventListener(
+      "click",
+      stopPrompter
+    );
+
+
+    /* =========================
+       键盘快捷键
+
+       Esc       退出
+       →
+       Space     下一页
+       ========================= */
+
+    document.addEventListener(
+      "keydown",
+      event => {
+
+        if (
+          !document.body.classList.contains(
+            "is-playing"
+          )
+        ) {
+
+          return;
+
+        }
+
+
+        if (
+          event.key
+          ===
+          "Escape"
+        ) {
+
+          stopPrompter();
+
+        }
+
+        else if (
+          event.key
+          ===
+          "ArrowRight"
+          ||
+          event.key
+          ===
+          " "
+        ) {
+
+          event.preventDefault();
+
+
+          showNextPage(
+            runId
+          );
+
+        }
+
+      }
+    );
+
+
+    /* =========================
+       浏览器宽度变化时
+       首页重新计算页数
+       ========================= */
+
+    window.addEventListener(
+      "resize",
+      () => {
+
+        if (
+          !document.body.classList.contains(
+            "is-playing"
+          )
+        ) {
+
+          updateStats();
+
+        }
+
+      }
+    );
+
+
+    /* =========================
+       初始化
+       ========================= */
 
     updateStats();
+
   </script>
+
 </body>
 </html>
