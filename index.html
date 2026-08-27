@@ -95,7 +95,7 @@
 
     .controls {
       display: grid;
-      grid-template-columns: minmax(0, 1fr) 170px 132px;
+      grid-template-columns: minmax(0, 1fr) 150px 170px 132px;
       gap: 12px;
       align-items: end;
     }
@@ -113,6 +113,7 @@
 
     textarea,
     input,
+    select,
     button {
       border: 1px solid var(--line);
       border-radius: 8px;
@@ -130,13 +131,15 @@
     }
 
     input,
+    select,
     button {
       height: 42px;
       padding: 0 12px;
     }
 
     textarea:focus,
-    input:focus {
+    input:focus,
+    select:focus {
       border-color: #e9a7bbaa;
       box-shadow: 0 0 0 3px #e9a7bb30;
     }
@@ -191,6 +194,32 @@
       width: min(80vw, 1120px);
       min-width: min(60vw, calc(100vw - 24px));
       text-align: left;
+    }
+
+    .stage-actions {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin-top: 28px;
+      flex-wrap: wrap;
+    }
+
+    .stage-actions button {
+      min-width: 132px;
+      height: 46px;
+    }
+
+    .stage-actions .secondary-button {
+      background: #fff9fb;
+      color: var(--secondary);
+      border-color: #e9a7bb88;
+    }
+
+    .mode-tip {
+      margin-top: 12px;
+      color: var(--muted);
+      font-size: 13px;
+      text-align: center;
     }
 
     .prompt-text {
@@ -275,7 +304,7 @@
         <span class="mark"></span>
         <div>
           <h1>英文提词器</h1>
-          <p>两句一组 / 立刻切换</p>
+          <p>两句一组 / 手动或自动切换</p>
         </div>
       </div>
 
@@ -285,15 +314,22 @@
           <textarea id="sourceText" autocomplete="off" spellcheck="false" placeholder="Paste English text here. Each sentence should end with a period."></textarea>
         </label>
         <label>
-          总秒数
-          <input id="totalSeconds" type="number" min="1" step="1" inputmode="numeric" autocomplete="off" placeholder="例如 90">
+          切换方式
+          <select id="switchMode">
+            <option value="manual">手动切换</option>
+            <option value="auto">自动切换</option>
+          </select>
+        </label>
+        <label>
+          自动切换秒数
+          <input id="autoSeconds" type="number" min="0.2" step="0.1" inputmode="decimal" autocomplete="off" placeholder="例如 5" disabled>
         </label>
         <button id="startButton" type="button">开始提词</button>
       </div>
 
       <div class="stats" aria-live="polite">
         <span id="sentenceStat">等待输入英文</span>
-        <span id="timeStat">输入总秒数</span>
+        <span id="timeStat">当前：手动切换</span>
       </div>
     </section>
   </main>
@@ -301,19 +337,31 @@
   <section class="stage" aria-live="off" aria-hidden="true">
     <div class="prompter">
       <p class="prompt-text"><span id="promptText"></span><span class="cursor" aria-hidden="true"></span></p>
+      <div class="stage-actions">
+        <button id="nextButton" type="button">下一句</button>
+        <button id="exitButton" class="secondary-button" type="button">退出</button>
+      </div>
+      <div id="modeTip" class="mode-tip">手动模式：点击“下一句”继续</div>
     </div>
   </section>
 
   <script>
     const sourceText = document.getElementById("sourceText");
-    const totalSeconds = document.getElementById("totalSeconds");
+    const switchMode = document.getElementById("switchMode");
+    const autoSeconds = document.getElementById("autoSeconds");
     const startButton = document.getElementById("startButton");
     const sentenceStat = document.getElementById("sentenceStat");
     const timeStat = document.getElementById("timeStat");
     const stage = document.querySelector(".stage");
     const promptText = document.getElementById("promptText");
+    const nextButton = document.getElementById("nextButton");
+    const exitButton = document.getElementById("exitButton");
+    const modeTip = document.getElementById("modeTip");
 
     let runId = 0;
+    let groups = [];
+    let currentIndex = 0;
+    let autoTimer = null;
 
     function splitSentences(value) {
       return value
@@ -332,57 +380,32 @@
       return groups;
     }
 
-    function buildSchedule(groups, totalMs) {
-      const reserveMs = Math.min(10000, Math.max(0, totalMs * 0.1));
-      const finalDelay = 180;
-      const blankDurations = groups.map((_, index) => (
-        index === groups.length - 1 ? 0 : 35 + Math.random() * 75
-      ));
-      const blankMs = blankDurations.reduce((sum, duration) => sum + duration, 0);
-      const targetMs = Math.max(
-        groups.length * 80,
-        totalMs - reserveMs - blankMs - finalDelay
-      );
-      const weights = groups.map(() => 0.72 + Math.random() * 0.64);
-      const weightSum = weights.reduce((sum, weight) => sum + weight, 0) || 1;
-
-      return {
-        blankDurations,
-        finalDelay,
-        holdDurations: weights.map(weight => (targetMs * weight) / weightSum),
-      };
-    }
-
-    function estimate(sentences) {
-      if (!sentences.length) return 0;
-      const groups = groupSentences(sentences).length;
-      return Math.max(1, Math.ceil(((groups * 80) + (Math.max(0, groups - 1) * 35) + 180) / 1000));
+    function clearAutoTimer() {
+      if (autoTimer !== null) {
+        window.clearTimeout(autoTimer);
+        autoTimer = null;
+      }
     }
 
     function updateStats() {
       const sentences = splitSentences(sourceText.value);
-      const seconds = Number(totalSeconds.value);
-      const minimum = estimate(sentences);
+      const mode = switchMode.value;
+      const seconds = Number(autoSeconds.value);
 
       sentenceStat.textContent = sentences.length
         ? `${sentences.length} 句 / ${groupSentences(sentences).length} 组`
         : "等待输入英文";
 
       timeStat.classList.remove("warn");
-      if (!seconds) {
-        timeStat.textContent = "输入总秒数";
-      } else if (minimum && seconds < minimum) {
-        timeStat.textContent = `内容太短，至少 ${minimum}s`;
+
+      if (mode === "manual") {
+        timeStat.textContent = "当前：手动切换";
+      } else if (!Number.isFinite(seconds) || seconds <= 0) {
+        timeStat.textContent = "请输入有效自动切换秒数";
         timeStat.classList.add("warn");
       } else {
-        timeStat.textContent = minimum ? `预计可在 ${seconds}s 内完成` : "输入英文后估算";
+        timeStat.textContent = `当前：每 ${seconds}s 自动切换`;
       }
-    }
-
-    function sleep(ms, id) {
-      return new Promise(resolve => {
-        window.setTimeout(() => resolve(runId === id), Math.max(0, ms));
-      });
     }
 
     function setPlaying(isPlaying) {
@@ -391,52 +414,112 @@
       startButton.disabled = isPlaying;
     }
 
-    async function startPrompter() {
+    function stopPrompter() {
+      runId += 1;
+      clearAutoTimer();
+      setPlaying(false);
+      promptText.textContent = "";
+      groups = [];
+      currentIndex = 0;
+      updateStats();
+    }
+
+    function finishPrompter() {
+      clearAutoTimer();
+      promptText.textContent = "已完成";
+      nextButton.disabled = true;
+      modeTip.textContent = "全部内容已完成，点击“退出”返回。";
+    }
+
+    function scheduleNext(id) {
+      clearAutoTimer();
+      if (switchMode.value !== "auto") return;
+
+      const seconds = Number(autoSeconds.value);
+      if (!Number.isFinite(seconds) || seconds <= 0) return;
+
+      autoTimer = window.setTimeout(() => {
+        if (runId === id && document.body.classList.contains("is-playing")) {
+          showNextGroup(id);
+        }
+      }, seconds * 1000);
+    }
+
+    function showCurrentGroup(id) {
+      if (runId !== id || !groups.length) return;
+
+      if (currentIndex >= groups.length) {
+        finishPrompter();
+        return;
+      }
+
+      promptText.textContent = groups[currentIndex].join("\n");
+      nextButton.disabled = false;
+
+      if (switchMode.value === "auto") {
+        const seconds = Number(autoSeconds.value);
+        modeTip.textContent = `自动模式：${seconds}s 后切换，也可点击“下一句”立即切换`;
+      } else {
+        modeTip.textContent = "手动模式：点击“下一句”继续";
+      }
+
+      scheduleNext(id);
+    }
+
+    function showNextGroup(id = runId) {
+      if (!document.body.classList.contains("is-playing")) return;
+      clearAutoTimer();
+      currentIndex += 1;
+      showCurrentGroup(id);
+    }
+
+    function startPrompter() {
       const sentences = splitSentences(sourceText.value);
-      const seconds = Number(totalSeconds.value);
+      const mode = switchMode.value;
+      const seconds = Number(autoSeconds.value);
 
       if (!sentences.length) {
         sentenceStat.textContent = "请先输入英文段落";
         return;
       }
 
-      if (!Number.isFinite(seconds) || seconds <= 0) {
-        timeStat.textContent = "请填写有效秒数";
+      if (mode === "auto" && (!Number.isFinite(seconds) || seconds <= 0)) {
+        timeStat.textContent = "请填写有效自动切换秒数";
         timeStat.classList.add("warn");
         return;
       }
 
       const id = ++runId;
-      const groups = groupSentences(sentences);
-      const schedule = buildSchedule(groups, seconds * 1000);
+      groups = groupSentences(sentences);
+      currentIndex = 0;
       promptText.textContent = "";
+      nextButton.disabled = false;
       setPlaying(true);
-
-      for (let index = 0; index < groups.length; index += 1) {
-        if (runId !== id) return;
-        promptText.textContent = groups[index].join("\n");
-        if (!await sleep(schedule.holdDurations[index], id)) return;
-        promptText.textContent = "";
-        if (!await sleep(schedule.blankDurations[index], id)) return;
-      }
-
-      if (runId === id) {
-        await sleep(schedule.finalDelay, id);
-        setPlaying(false);
-        promptText.textContent = "";
-        updateStats();
-      }
+      showCurrentGroup(id);
     }
 
     sourceText.addEventListener("input", updateStats);
-    totalSeconds.addEventListener("input", updateStats);
+    autoSeconds.addEventListener("input", updateStats);
+
+    switchMode.addEventListener("change", () => {
+      const isAuto = switchMode.value === "auto";
+      autoSeconds.disabled = !isAuto;
+      if (isAuto && !autoSeconds.value) autoSeconds.value = "5";
+      updateStats();
+    });
+
     startButton.addEventListener("click", startPrompter);
+    nextButton.addEventListener("click", () => showNextGroup(runId));
+    exitButton.addEventListener("click", stopPrompter);
 
     document.addEventListener("keydown", event => {
-      if (event.key === "Escape" && document.body.classList.contains("is-playing")) {
-        runId += 1;
-        setPlaying(false);
-        promptText.textContent = "";
+      if (!document.body.classList.contains("is-playing")) return;
+
+      if (event.key === "Escape") {
+        stopPrompter();
+      } else if (event.key === "ArrowRight" || event.key === " ") {
+        event.preventDefault();
+        showNextGroup(runId);
       }
     });
 
