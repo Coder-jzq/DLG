@@ -45,68 +45,112 @@
       content: "";
       position: fixed;
       inset: 0;
+
       background-image:
         linear-gradient(var(--line) 1px, transparent 1px),
         linear-gradient(90deg, var(--line) 1px, transparent 1px);
+
       background-size: 42px 42px;
-      -webkit-mask-image: linear-gradient(to bottom, #0004, transparent);
-      mask-image: linear-gradient(to bottom, #0004, transparent);
+
+      -webkit-mask-image:
+        linear-gradient(to bottom, #0004, transparent);
+
+      mask-image:
+        linear-gradient(to bottom, #0004, transparent);
+
       pointer-events: none;
     }
 
     .shell {
       position: relative;
-      width: min(980px, calc(100% - 40px));
+
+      width:
+        min(
+          980px,
+          calc(100% - 40px)
+        );
+
       margin: 0 auto;
+
       padding: 34px 0;
     }
 
     .panel {
       padding: 22px;
+
       background: var(--card);
+
       border: 1px solid var(--line);
       border-radius: 8px;
-      box-shadow: 0 20px 80px #e9a7bb26, inset 0 1px 0 #ffffff;
+
+      box-shadow:
+        0 20px 80px #e9a7bb26,
+        inset 0 1px 0 #ffffff;
     }
 
     .brand {
       display: flex;
       align-items: center;
+
       gap: 14px;
+
       margin-bottom: 20px;
     }
 
     .mark {
       width: 34px;
       height: 34px;
+
       flex: 0 0 auto;
+
       border-radius: 8px;
-      background: linear-gradient(135deg, var(--primary), #f5c6d2);
-      box-shadow: 0 0 34px #e9a7bb80;
+
+      background:
+        linear-gradient(
+          135deg,
+          var(--primary),
+          #f5c6d2
+        );
+
+      box-shadow:
+        0 0 34px #e9a7bb80;
     }
 
     .brand h1 {
       margin: 0;
+
       font-size: 28px;
+
       line-height: 1.1;
     }
 
     .brand p {
       margin: 5px 0 0;
+
       color: var(--muted);
     }
 
     .controls {
       display: grid;
-      grid-template-columns: minmax(0, 1fr) 150px 170px 132px;
+
+      grid-template-columns:
+        minmax(0, 1fr)
+        150px
+        170px
+        132px;
+
       gap: 12px;
+
       align-items: end;
     }
 
     label {
       display: grid;
+
       gap: 7px;
+
       color: var(--muted);
+
       font-size: 13px;
     }
 
@@ -119,17 +163,25 @@
     select,
     button {
       border: 1px solid var(--line);
+
       border-radius: 8px;
+
       background: #fff9fb;
+
       color: var(--text);
+
       font: inherit;
+
       outline: none;
     }
 
     textarea {
       min-height: 230px;
+
       resize: vertical;
+
       padding: 14px;
+
       line-height: 1.58;
     }
 
@@ -137,6 +189,7 @@
     select,
     button {
       height: 42px;
+
       padding: 0 12px;
     }
 
@@ -144,100 +197,204 @@
     input:focus,
     select:focus {
       border-color: #e9a7bbaa;
-      box-shadow: 0 0 0 3px #e9a7bb30;
+
+      box-shadow:
+        0 0 0 3px #e9a7bb30;
     }
 
     button {
       cursor: pointer;
-      background: linear-gradient(135deg, var(--primary), var(--secondary));
+
+      background:
+        linear-gradient(
+          135deg,
+          var(--primary),
+          var(--secondary)
+        );
+
       border-color: #efb9c9;
+
       color: #fff;
+
       font-weight: 700;
     }
 
     button:disabled {
       cursor: not-allowed;
+
       opacity: 0.55;
     }
 
     .stats {
       display: flex;
+
       gap: 10px;
+
       flex-wrap: wrap;
+
       margin-top: 16px;
+
       color: var(--muted);
+
       font-size: 13px;
     }
 
     .stats span {
-      border: 1px solid var(--line);
-      border-radius: 999px;
-      padding: 6px 10px;
-      background: #fff7fa;
+      border:
+        1px solid var(--line);
+
+      border-radius:
+        999px;
+
+      padding:
+        6px 10px;
+
+      background:
+        #fff7fa;
     }
 
     .stats .warn {
       color: var(--warn);
-      border-color: #ffd16666;
+
+      border-color:
+        #ffd16666;
     }
+
+
+    /*
+      ============================
+      提词页面
+      ============================
+    */
 
     .stage {
       position: fixed;
+
       inset: 0;
+
       z-index: 10;
+
       display: none;
+
       justify-content: center;
       align-items: flex-start;
-      padding-top: clamp(18px, 5vh, 54px);
+
+      padding-top:
+        clamp(
+          18px,
+          5vh,
+          54px
+        );
+
       background: #fff;
     }
 
     .prompter {
       position: relative;
-      width: min(80vw, 1120px);
-      min-width: min(60vw, calc(100vw - 24px));
+
+      width:
+        min(
+          80vw,
+          1120px
+        );
+
+      min-width:
+        min(
+          60vw,
+          calc(100vw - 24px)
+        );
+
       text-align: left;
     }
 
+
     /*
-      页面内容由 JS 主动插入换行。
-      每页固定 2 行，每行固定 80 个字符。
+      每页固定两行。
+
+      JS 主动按照单词数量插入换行：
+
+      第一行：
+      14 个完整单词
+
+      第二行：
+      14 个完整单词
+
+      不会拆分任何一个单词。
     */
+
     .prompt-text {
       min-height: 3.1em;
+
       margin: 0;
-      font-size: clamp(13px, 1.55vw, 20px);
+
+      font-size:
+        clamp(
+          13px,
+          1.55vw,
+          20px
+        );
+
       line-height: 1.55;
+
       font-weight: 400;
+
       letter-spacing: 0;
-      color: rgb(219 112 147 / 38%);
+
+      color:
+        rgb(
+          219 112 147 / 38%
+        );
+
+      /*
+        保留 JS 插入的换行
+      */
       white-space: pre;
+
+      /*
+        不允许浏览器主动拆单词
+      */
+      word-break: keep-all;
+
+      overflow-wrap: normal;
+
       overflow: hidden;
     }
 
+
     .stage-actions {
       display: flex;
+
       justify-content: center;
+
       gap: 12px;
+
       margin-top: 28px;
+
       flex-wrap: wrap;
     }
 
     .stage-actions button {
       min-width: 132px;
+
       height: 46px;
     }
 
     .stage-actions .secondary-button {
       background: #fff9fb;
+
       color: var(--secondary);
-      border-color: #e9a7bb88;
+
+      border-color:
+        #e9a7bb88;
     }
 
     .mode-tip {
       margin-top: 12px;
+
       color: var(--muted);
+
       font-size: 13px;
+
       text-align: center;
     }
 
@@ -253,10 +410,17 @@
       display: flex;
     }
 
+
     @media (max-width: 760px) {
+
       .shell {
-        width: calc(100% - 20px);
-        padding: 16px 0;
+        width:
+          calc(
+            100% - 20px
+          );
+
+        padding:
+          16px 0;
       }
 
       .panel {
@@ -268,68 +432,114 @@
       }
 
       .controls {
-        grid-template-columns: 1fr;
+        grid-template-columns:
+          1fr;
       }
 
       textarea {
-        min-height: 260px;
+        min-height:
+          260px;
       }
 
       .stage {
-        padding-top: clamp(16px, 4vh, 44px);
+        padding-top:
+          clamp(
+            16px,
+            4vh,
+            44px
+          );
       }
 
       .prompter {
-        width: calc(100vw - 24px);
+        width:
+          calc(
+            100vw - 24px
+          );
+
         min-width: 0;
       }
 
-      /*
-        小屏幕适当缩小字号，尽量确保 80 字符一行能显示。
-      */
       .prompt-text {
-        font-size: clamp(10px, 2.1vw, 15px);
+        font-size:
+          clamp(
+            10px,
+            2vw,
+            15px
+          );
       }
     }
   </style>
 </head>
 
+
 <body>
 
+  <!-- =========================
+       输入页面
+       ========================= -->
+
   <main class="shell">
+
     <section class="panel">
 
       <div class="brand">
+
         <span class="mark"></span>
 
         <div>
-          <h1>英文提词器</h1>
-          <p>每行 80 字符 / 每页 2 行 / 手动或自动切换</p>
+
+          <h1>
+            英文提词器
+          </h1>
+
+          <p>
+            每行 14 个单词 / 每页 2 行 / 手动或自动切换
+          </p>
+
         </div>
+
       </div>
+
 
       <div class="controls">
 
         <label class="english-field">
+
           英文段落
+
           <textarea
             id="sourceText"
             autocomplete="off"
             spellcheck="false"
             placeholder="Paste English text here."
           ></textarea>
+
         </label>
 
+
         <label>
+
           切换方式
+
           <select id="switchMode">
-            <option value="manual">手动切换</option>
-            <option value="auto">自动切换</option>
+
+            <option value="manual">
+              手动切换
+            </option>
+
+            <option value="auto">
+              自动切换
+            </option>
+
           </select>
+
         </label>
 
+
         <label>
+
           自动切换秒数
+
           <input
             id="autoSeconds"
             type="number"
@@ -340,38 +550,68 @@
             placeholder="例如 5"
             disabled
           >
+
         </label>
 
-        <button id="startButton" type="button">
+
+        <button
+          id="startButton"
+          type="button"
+        >
           开始提词
         </button>
 
       </div>
 
-      <div class="stats" aria-live="polite">
-        <span id="charStat">等待输入英文</span>
-        <span id="timeStat">当前：手动切换</span>
+
+      <div
+        class="stats"
+        aria-live="polite"
+      >
+
+        <span id="wordStat">
+          等待输入英文
+        </span>
+
+        <span id="timeStat">
+          当前：手动切换
+        </span>
+
       </div>
 
     </section>
+
   </main>
 
+
+  <!-- =========================
+       提词页面
+       ========================= -->
 
   <section
     class="stage"
     aria-live="off"
     aria-hidden="true"
   >
+
     <div class="prompter">
 
       <p class="prompt-text">
+
         <span id="promptText"></span>
+
       </p>
 
+
       <div class="stage-actions">
-        <button id="nextButton" type="button">
+
+        <button
+          id="nextButton"
+          type="button"
+        >
           下一页
         </button>
+
 
         <button
           id="exitButton"
@@ -380,214 +620,573 @@
         >
           退出
         </button>
+
       </div>
 
-      <div id="modeTip" class="mode-tip">
+
+      <div
+        id="modeTip"
+        class="mode-tip"
+      >
         手动模式：点击“下一页”继续
       </div>
 
     </div>
+
   </section>
 
 
   <script>
+
     /*
       ============================================
+
       固定分页参数
 
-      每行 80 个字符
-      每页 2 行
-      每页共 160 个字符
+      每行：
+      14 个单词
 
-      如果以后想改：
-      例如每行 70 个字符：
-      CHARS_PER_LINE = 70
+      每页：
+      2 行
 
-      如果想每页 3 行：
-      LINES_PER_PAGE = 3
+      所以每页最多：
+      28 个单词
+
+
+      如果以后想调整：
+
+      每行 12 个单词：
+
+      const WORDS_PER_LINE = 12;
+
+
+      每页 3 行：
+
+      const LINES_PER_PAGE = 3;
+
       ============================================
     */
 
-    const CHARS_PER_LINE = 80;
+
+    const WORDS_PER_LINE = 14;
+
     const LINES_PER_PAGE = 2;
-    const CHARS_PER_PAGE =
-      CHARS_PER_LINE * LINES_PER_PAGE;
 
 
-    /* DOM */
+    const WORDS_PER_PAGE =
+
+      WORDS_PER_LINE
+
+      *
+
+      LINES_PER_PAGE;
+
+
+
+    /*
+      ==========================
+      DOM
+      ==========================
+    */
+
 
     const sourceText =
-      document.getElementById("sourceText");
+
+      document.getElementById(
+        "sourceText"
+      );
+
 
     const switchMode =
-      document.getElementById("switchMode");
+
+      document.getElementById(
+        "switchMode"
+      );
+
 
     const autoSeconds =
-      document.getElementById("autoSeconds");
+
+      document.getElementById(
+        "autoSeconds"
+      );
+
 
     const startButton =
-      document.getElementById("startButton");
 
-    const charStat =
-      document.getElementById("charStat");
+      document.getElementById(
+        "startButton"
+      );
+
+
+    const wordStat =
+
+      document.getElementById(
+        "wordStat"
+      );
+
 
     const timeStat =
-      document.getElementById("timeStat");
+
+      document.getElementById(
+        "timeStat"
+      );
+
 
     const stage =
-      document.querySelector(".stage");
+
+      document.querySelector(
+        ".stage"
+      );
+
 
     const promptText =
-      document.getElementById("promptText");
+
+      document.getElementById(
+        "promptText"
+      );
+
 
     const nextButton =
-      document.getElementById("nextButton");
+
+      document.getElementById(
+        "nextButton"
+      );
+
 
     const exitButton =
-      document.getElementById("exitButton");
+
+      document.getElementById(
+        "exitButton"
+      );
+
 
     const modeTip =
-      document.getElementById("modeTip");
+
+      document.getElementById(
+        "modeTip"
+      );
 
 
-    /* 播放状态 */
+
+    /*
+      ==========================
+      播放状态
+      ==========================
+    */
+
 
     let runId = 0;
+
+
     let pages = [];
+
+
     let currentIndex = 0;
+
+
     let autoTimer = null;
 
 
+
     /*
-      清理输入。
+      ============================================
 
-      所有换行、Tab、连续空格都变成一个普通空格。
+      清理输入文本
 
-      注意：
-      不分析句号，
-      不分析逗号，
-      不分析单词，
-      完全按照字符位置分页。
+
+      无论原始内容里面有：
+
+      多个空格
+
+      多个换行
+
+      Tab
+
+      空行
+
+
+      全部统一变成：
+
+      单词 + 一个空格 + 单词
+
+
+      例如原始输入：
+
+      Hello       everyone,
+
+
+      today      we
+
+          introduce this model.
+
+
+      会自动变为：
+
+      Hello everyone, today we introduce this model.
+
+
+      ============================================
     */
+
 
     function normalizeText(value) {
+
       return value
-        .replace(/\s+/g, " ")
+
+        .replace(
+          /\s+/g,
+          " "
+        )
+
         .trim();
+
     }
 
 
-    /*
-      把一页的 160 个字符
-      强制拆成两行：
-
-      第 1 行：0 ~ 79
-      第 2 行：80 ~ 159
-
-      不考虑是不是完整单词。
-    */
-
-    function formatPage(pageText) {
-      const lines = [];
-
-      for (
-        let index = 0;
-        index < pageText.length;
-        index += CHARS_PER_LINE
-      ) {
-        lines.push(
-          pageText.slice(
-            index,
-            index + CHARS_PER_LINE
-          )
-        );
-      }
-
-      return lines.join("\n");
-    }
-
 
     /*
-      按固定字符数分页。
+      ============================================
 
-      每页 160 个字符。
+      将文本转换为单词数组
+
+
+      只按照空格划分。
+
 
       例如：
-      第 1 页：0 ~ 159
-      第 2 页：160 ~ 319
-      第 3 页：320 ~ 479
-      ...
+
+      Hello, everyone. How are you?
+
+
+      得到：
+
+      [
+        "Hello,",
+        "everyone.",
+        "How",
+        "are",
+        "you?"
+      ]
+
+
+      所以一共是：
+
+      5 个单词
+
+
+      标点保留在对应单词上。
+
+      ============================================
     */
 
-    function buildPages(value) {
+
+    function getWords(value) {
+
       const text =
-        normalizeText(value);
+
+        normalizeText(
+          value
+        );
+
+
+      if (
+        !text
+      ) {
+
+        return [];
+
+      }
+
+
+      return text.split(
+        " "
+      );
+
+    }
+
+
+
+    /*
+      ============================================
+
+      格式化单页
+
+
+      每页最多：
+
+      28 个单词
+
+
+      第一行：
+
+      第 1 - 14 个单词
+
+
+      第二行：
+
+      第 15 - 28 个单词
+
+
+      每个单词之间：
+
+      只有一个空格
+
+
+      不允许拆分单词。
+
+      ============================================
+    */
+
+
+    function formatPage(
+      pageWords
+    ) {
+
+      const lines = [];
+
+
+      for (
+
+        let index = 0;
+
+        index < pageWords.length;
+
+        index += WORDS_PER_LINE
+
+      ) {
+
+
+        const lineWords =
+
+          pageWords.slice(
+
+            index,
+
+            index + WORDS_PER_LINE
+
+          );
+
+
+        /*
+          单词之间始终一个空格
+        */
+
+        lines.push(
+
+          lineWords.join(
+            " "
+          )
+
+        );
+
+      }
+
+
+      /*
+        每 14 个单词主动换行
+      */
+
+      return lines.join(
+        "\n"
+      );
+
+    }
+
+
+
+    /*
+      ============================================
+
+      按固定单词数量分页
+
+
+      例如：
+
+      一共有 70 个单词
+
+
+      第 1 页：
+
+      单词 1 - 28
+
+
+      第 2 页：
+
+      单词 29 - 56
+
+
+      第 3 页：
+
+      单词 57 - 70
+
+
+      注意：
+
+      不判断句号。
+
+      不判断逗号。
+
+      不判断是否完整句子。
+
+      只统计单词数量。
+
+      ============================================
+    */
+
+
+    function buildPages(value) {
+
+      const words =
+
+        getWords(
+          value
+        );
+
 
       const result = [];
 
+
       for (
+
         let index = 0;
-        index < text.length;
-        index += CHARS_PER_PAGE
+
+        index < words.length;
+
+        index += WORDS_PER_PAGE
+
       ) {
-        const pageText =
-          text.slice(
+
+
+        /*
+          每次获取完整的 28 个单词
+        */
+
+        const pageWords =
+
+          words.slice(
+
             index,
-            index + CHARS_PER_PAGE
+
+            index + WORDS_PER_PAGE
+
           );
 
+
         result.push(
-          formatPage(pageText)
+
+          formatPage(
+            pageWords
+          )
+
         );
+
       }
+
 
       return result;
+
     }
 
 
+
     /*
+      ==========================
       清除自动切换计时器
+      ==========================
     */
+
 
     function clearAutoTimer() {
-      if (autoTimer !== null) {
-        window.clearTimeout(autoTimer);
+
+      if (
+        autoTimer !== null
+      ) {
+
+        window.clearTimeout(
+          autoTimer
+        );
+
+
         autoTimer = null;
+
       }
+
     }
 
 
+
     /*
-      更新首页统计信息
+      ==========================
+      更新统计信息
+      ==========================
     */
 
+
     function updateStats() {
-      const text =
-        normalizeText(
+
+      const words =
+
+        getWords(
           sourceText.value
         );
 
+
       const mode =
+
         switchMode.value;
 
+
       const seconds =
+
         Number(
           autoSeconds.value
         );
 
+
+      /*
+        根据单词数量计算页数
+      */
+
       const pageCount =
-        text.length
-          ? Math.ceil(
-              text.length /
-              CHARS_PER_PAGE
-            )
-          : 0;
+
+        words.length
+
+          ?
+
+          Math.ceil(
+
+            words.length
+
+            /
+
+            WORDS_PER_PAGE
+
+          )
+
+          :
+
+          0;
 
 
-      charStat.textContent =
-        text.length
-          ? `${text.length} 字符 / ${pageCount} 页 / 每页最多 ${CHARS_PER_PAGE} 字符`
-          : "等待输入英文";
+
+      /*
+        显示：
+
+        100 个单词 / 4 页
+      */
+
+      wordStat.textContent =
+
+        words.length
+
+          ?
+
+          `${words.length} 个单词 / ${pageCount} 页 / 每页最多 ${WORDS_PER_PAGE} 个单词`
+
+          :
+
+          "等待输入英文";
+
 
 
       timeStat.classList.remove(
@@ -595,399 +1194,900 @@
       );
 
 
-      if (mode === "manual") {
+      if (
+        mode === "manual"
+      ) {
+
         timeStat.textContent =
+
           "当前：手动切换";
+
       }
 
+
       else if (
-        !Number.isFinite(seconds)
+
+        !Number.isFinite(
+          seconds
+        )
+
         ||
+
         seconds <= 0
+
       ) {
+
         timeStat.textContent =
+
           "请输入有效自动切换秒数";
+
 
         timeStat.classList.add(
           "warn"
         );
+
       }
+
 
       else {
+
         timeStat.textContent =
+
           `当前：每 ${seconds}s 自动切换`;
+
       }
+
     }
 
 
+
     /*
-      设置提词状态
+      ==========================
+      设置播放状态
+      ==========================
     */
 
-    function setPlaying(isPlaying) {
+
+    function setPlaying(
+      isPlaying
+    ) {
+
       document.body.classList.toggle(
+
         "is-playing",
+
         isPlaying
+
       );
+
 
       stage.setAttribute(
+
         "aria-hidden",
-        String(!isPlaying)
+
+        String(
+          !isPlaying
+        )
+
       );
 
+
       startButton.disabled =
+
         isPlaying;
+
     }
 
 
+
     /*
-      退出
+      ==========================
+      退出提词
+      ==========================
     */
 
+
     function stopPrompter() {
+
       runId += 1;
+
 
       clearAutoTimer();
 
-      setPlaying(false);
 
-      promptText.textContent = "";
+      setPlaying(
+        false
+      );
+
+
+      promptText.textContent =
+
+        "";
+
 
       pages = [];
 
+
       currentIndex = 0;
 
-      nextButton.disabled = false;
-
-      updateStats();
-    }
-
-
-    /*
-      所有内容结束
-    */
-
-    function finishPrompter() {
-      clearAutoTimer();
-
-      promptText.textContent =
-        "已完成";
 
       nextButton.disabled =
-        true;
 
-      modeTip.textContent =
-        "全部内容已完成，点击“退出”返回。";
+        false;
+
+
+      updateStats();
+
     }
 
 
+
     /*
-      自动模式下，
-      当前页面显示指定秒数后切换
+      ==========================
+      播放结束
+      ==========================
     */
 
-    function scheduleNext(id) {
+
+    function finishPrompter() {
+
       clearAutoTimer();
 
+
+      promptText.textContent =
+
+        "已完成";
+
+
+      nextButton.disabled =
+
+        true;
+
+
+      modeTip.textContent =
+
+        "全部内容已完成，点击“退出”返回。";
+
+    }
+
+
+
+    /*
+      ==========================
+      自动切换
+      ==========================
+    */
+
+
+    function scheduleNext(id) {
+
+      clearAutoTimer();
+
+
       if (
-        switchMode.value !== "auto"
+
+        switchMode.value
+
+        !==
+
+        "auto"
+
       ) {
+
         return;
+
       }
 
+
       const seconds =
+
         Number(
           autoSeconds.value
         );
 
+
       if (
-        !Number.isFinite(seconds)
+
+        !Number.isFinite(
+          seconds
+        )
+
         ||
+
         seconds <= 0
+
       ) {
+
         return;
+
       }
 
+
       autoTimer =
+
         window.setTimeout(
+
           () => {
+
+
             if (
+
               runId === id
+
               &&
+
               document.body.classList.contains(
                 "is-playing"
               )
+
             ) {
-              showNextPage(id);
+
+              showNextPage(
+                id
+              );
+
             }
+
           },
+
+
           seconds * 1000
+
         );
+
     }
 
 
+
     /*
+      ==========================
       显示当前页
+      ==========================
     */
 
+
     function showCurrentPage(id) {
-      if (
-        runId !== id
-        ||
-        !pages.length
-      ) {
-        return;
-      }
 
       if (
-        currentIndex >=
-        pages.length
+
+        runId !== id
+
+        ||
+
+        !pages.length
+
       ) {
-        finishPrompter();
+
         return;
+
       }
+
+
+      if (
+
+        currentIndex
+
+        >=
+
+        pages.length
+
+      ) {
+
+        finishPrompter();
+
+        return;
+
+      }
+
+
+
+      /*
+        当前页面已经在 buildPages
+        中按照：
+
+        14 个单词一行
+
+        28 个单词一页
+
+        排列好了。
+      */
+
 
       promptText.textContent =
-        pages[currentIndex];
+
+        pages[
+          currentIndex
+        ];
+
+
 
       nextButton.disabled =
+
         false;
 
 
+
+      /*
+        自动模式
+      */
+
+
       if (
-        switchMode.value ===
+
+        switchMode.value
+
+        ===
+
         "auto"
+
       ) {
+
+
         const seconds =
+
           Number(
             autoSeconds.value
           );
 
+
         modeTip.textContent =
+
           `第 ${currentIndex + 1}/${pages.length} 页 · ${seconds}s 后自动切换 · 也可手动点击“下一页”`;
+
       }
+
+
+      /*
+        手动模式
+      */
 
       else {
+
         modeTip.textContent =
+
           `第 ${currentIndex + 1}/${pages.length} 页 · 手动模式 · 点击“下一页”继续`;
+
       }
 
-      scheduleNext(id);
+
+
+      scheduleNext(
+        id
+      );
+
     }
 
 
+
     /*
+      ==========================
       下一页
+      ==========================
     */
 
+
     function showNextPage(
+
       id = runId
+
     ) {
+
+
       if (
+
         !document.body.classList.contains(
           "is-playing"
         )
+
       ) {
+
         return;
+
       }
+
 
       clearAutoTimer();
 
+
       currentIndex += 1;
 
-      showCurrentPage(id);
+
+      showCurrentPage(
+        id
+      );
+
     }
 
 
+
     /*
+      ==========================
       开始提词
+      ==========================
     */
 
+
     function startPrompter() {
-      const text =
-        normalizeText(
+
+      const words =
+
+        getWords(
           sourceText.value
         );
 
+
       const mode =
+
         switchMode.value;
 
+
       const seconds =
+
         Number(
           autoSeconds.value
         );
 
 
-      if (!text.length) {
-        charStat.textContent =
+
+      /*
+        没有输入内容
+      */
+
+      if (
+        !words.length
+      ) {
+
+        wordStat.textContent =
+
           "请先输入英文段落";
 
+
         return;
+
       }
 
 
+
+      /*
+        自动模式检查秒数
+      */
+
       if (
+
         mode === "auto"
+
         &&
+
         (
-          !Number.isFinite(seconds)
+
+          !Number.isFinite(
+            seconds
+          )
+
           ||
+
           seconds <= 0
+
         )
+
       ) {
+
         timeStat.textContent =
+
           "请填写有效自动切换秒数";
+
 
         timeStat.classList.add(
           "warn"
         );
 
+
         return;
+
       }
 
 
+
+      /*
+        ========================================
+
+        开始提词之前：
+
+        自动把 textarea 里面：
+
+        多余空格
+
+        多余换行
+
+        Tab
+
+        全部统一变成一个空格。
+
+
+        这样：
+
+        输入区本身也会变干净。
+
+        ========================================
+      */
+
+
+      sourceText.value =
+
+        normalizeText(
+          sourceText.value
+        );
+
+
+
       const id =
+
         ++runId;
 
 
+
       /*
+        ========================================
+
         核心：
-        直接按每页 160 个字符切。
+
+        完全不按句子。
+
+        完全不按字符。
+
+        只按照完整单词数量。
+
+
+        每行：
+
+        14 个单词
+
+
+        每页：
+
+        28 个单词
+
+
+        一个单词绝对不会被拆开。
+
+        ========================================
       */
 
+
       pages =
-        buildPages(text);
+
+        buildPages(
+          sourceText.value
+        );
+
 
 
       currentIndex = 0;
 
-      promptText.textContent = "";
 
-      nextButton.disabled = false;
+      promptText.textContent =
 
-      setPlaying(true);
+        "";
 
-      showCurrentPage(id);
+
+      nextButton.disabled =
+
+        false;
+
+
+      setPlaying(
+        true
+      );
+
+
+      showCurrentPage(
+        id
+      );
+
     }
 
 
-    /* 输入文字 */
+
+    /*
+      ==========================
+      输入内容改变
+      ==========================
+    */
+
 
     sourceText.addEventListener(
+
       "input",
+
       updateStats
+
     );
 
-
-    /* 自动切换秒数 */
-
-    autoSeconds.addEventListener(
-      "input",
-      updateStats
-    );
 
 
     /*
-      手动 / 自动切换
+      ========================================
+
+      输入框失去焦点的时候，
+
+      自动整理文本格式。
+
+
+      所有：
+
+      换行
+
+      多空格
+
+      Tab
+
+
+      都变成：
+
+      一个空格
+
+      ========================================
     */
 
-    switchMode.addEventListener(
-      "change",
+
+    sourceText.addEventListener(
+
+      "blur",
+
       () => {
-        const isAuto =
-          switchMode.value ===
-          "auto";
 
-        autoSeconds.disabled =
-          !isAuto;
 
-        if (
-          isAuto
-          &&
-          !autoSeconds.value
-        ) {
-          autoSeconds.value =
-            "5";
-        }
+        sourceText.value =
+
+          normalizeText(
+            sourceText.value
+          );
+
 
         updateStats();
+
       }
+
     );
 
-
-    /* 开始按钮 */
-
-    startButton.addEventListener(
-      "click",
-      startPrompter
-    );
-
-
-    /* 下一页按钮 */
-
-    nextButton.addEventListener(
-      "click",
-      () => {
-        showNextPage(runId);
-      }
-    );
-
-
-    /* 退出按钮 */
-
-    exitButton.addEventListener(
-      "click",
-      stopPrompter
-    );
 
 
     /*
-      键盘快捷键：
-
-      Esc：
-      退出
-
-      →
-      Space：
-      下一页
+      ==========================
+      自动秒数
+      ==========================
     */
 
-    document.addEventListener(
-      "keydown",
-      event => {
+
+    autoSeconds.addEventListener(
+
+      "input",
+
+      updateStats
+
+    );
+
+
+
+    /*
+      ==========================
+      手动 / 自动模式
+      ==========================
+    */
+
+
+    switchMode.addEventListener(
+
+      "change",
+
+      () => {
+
+
+        const isAuto =
+
+          switchMode.value
+
+          ===
+
+          "auto";
+
+
+        autoSeconds.disabled =
+
+          !isAuto;
+
+
+
+        /*
+          自动模式默认 5 秒
+        */
+
         if (
+
+          isAuto
+
+          &&
+
+          !autoSeconds.value
+
+        ) {
+
+          autoSeconds.value =
+
+            "5";
+
+        }
+
+
+        updateStats();
+
+      }
+
+    );
+
+
+
+    /*
+      ==========================
+      开始按钮
+      ==========================
+    */
+
+
+    startButton.addEventListener(
+
+      "click",
+
+      startPrompter
+
+    );
+
+
+
+    /*
+      ==========================
+      下一页按钮
+      ==========================
+    */
+
+
+    nextButton.addEventListener(
+
+      "click",
+
+      () => {
+
+
+        showNextPage(
+          runId
+        );
+
+      }
+
+    );
+
+
+
+    /*
+      ==========================
+      退出按钮
+      ==========================
+    */
+
+
+    exitButton.addEventListener(
+
+      "click",
+
+      stopPrompter
+
+    );
+
+
+
+    /*
+      ========================================
+
+      键盘快捷键
+
+
+      Esc
+
+      退出
+
+
+      → 或 Space
+
+      下一页
+
+      ========================================
+    */
+
+
+    document.addEventListener(
+
+      "keydown",
+
+      event => {
+
+
+        if (
+
           !document.body.classList.contains(
             "is-playing"
           )
+
         ) {
+
           return;
+
         }
+
+
+
+        /*
+          Esc
+        */
 
         if (
-          event.key ===
+
+          event.key
+
+          ===
+
           "Escape"
+
         ) {
+
           stopPrompter();
+
         }
 
+
+
+        /*
+          右方向键 / 空格
+        */
+
         else if (
-          event.key ===
+
+          event.key
+
+          ===
+
           "ArrowRight"
+
           ||
-          event.key ===
+
+          event.key
+
+          ===
+
           " "
+
         ) {
+
           event.preventDefault();
+
 
           showNextPage(
             runId
           );
+
         }
+
       }
+
     );
 
 
-    /* 初始化 */
+
+    /*
+      ==========================
+      初始化
+      ==========================
+    */
+
 
     updateStats();
 
